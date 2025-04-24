@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - MentorMesh</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .mentor-card {
+            border: 1px solid #aaa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        .mentor-card h3 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}!</h1>
+    <p><strong>Your Role:</strong> {{ user.role.capitalize() }}</p>
+    <p><strong>Your Skills:</strong> {{ user.skills }}</p>
+    <p><strong>Your Bio:</strong> {{ user.bio }}</p>
+    <hr>
+
+    <!-- Search bar (for learners) -->
+    {% if user.role == 'learner' %}
+        <form method="GET" action="/dashboard">
+            <input type="text" name="q" placeholder="Search skill..." value="{{ request.args.q or '' }}">
+            <button type="submit">Search</button>
+        </form>
+    {% endif %}
+
+    <!-- Learner: Suggested Mentors -->
+    {% if user.role == 'learner' %}
+        <h2>Recommended Mentors</h2>
+        {% for mentor in suggested %}
+            <div class="mentor-card">
+                <h3>{{ mentor.name }}</h3>
+                <p><strong>Skills:</strong> {{ mentor.skills }}</p>
+                <p><strong>Rating:</strong> ⭐ {{ mentor.rating }}</p>
+                <p><strong>Bio:</strong> {{ mentor.bio }}</p>
+                <form method="POST" action="/request_session/{{ mentor.id }}">
+                    <label>Topic:</label><br>
+                    <input type="text" name="topic" required><br>
+                    <label>Message:</label><br>
+                    <textarea name="message" rows="2" required></textarea><br>
+                    <button type="submit">Request Session</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Mentor: Session Requests -->
+    {% if user.role == 'mentor' %}
+        <h2>Session Requests</h2>
+        {% if requests %}
+            {% for req in requests %}
+                <div class="mentor-card">
+                    <p><strong>From:</strong> {{ req.learner.username }}</p>
+                    <p><strong>Topic:</strong> {{ req.topic }}</p>
+                    <p><strong>Message:</strong> {{ req.message }}</p>
+                    {% if req.status == 'pending' %}
+                        <form method="POST" action="/approve_session/{{ req.id }}">
+                            <button name="action" value="accept">Accept</button>
+                            <button name="action" value="decline">Decline</button>
+                        </form>
+                    {% else %}
+                        <p><strong>Status:</strong> {{ req.status }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No session requests yet.</p>
+        {% endif %}
+    {% endif %}
+
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+</body>
+</html>
+{% endblock %}

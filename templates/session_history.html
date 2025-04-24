@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Session History</h2>
+
+{% if sessions %}
+    {% for s in sessions %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p><strong>With:</strong> 
+                {% if user.role == 'mentor' %}
+                    {{ s.learner.username }}
+                {% else %}
+                    {{ s.mentor.username }}
+                {% endif %}
+            </p>
+            <p><strong>Topic:</strong> {{ s.topic }}</p>
+            <p><strong>Status:</strong> {{ s.status }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No past sessions yet.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,99 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}MentorMesh{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Add in CSS -->
+<style>
+    .toast {
+        visibility: hidden;
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+        background-color: #444;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        z-index: 1;
+    }
+    .toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 20px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 20px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast {
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            animation: fadein 0.5s;
+        }
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        </style>
+        
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        {% if session.user_id %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+            <a href="/session_history">Session History</a>
+
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </nav>
+    <hr>
+    <div id="toast" class="toast"></div>
+    {% block content %}{% endblock %}
+
+    <!-- toast notification  -->
+     
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "toast show";
+            setTimeout(() => toast.className = "toast", 3000);
+        }
+      </script>
+      <div id="toast-container" class="toast-container"></div>
+<script>
+    function showToast(message) {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = message;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            showToast("{{ message }}");
+        {% endfor %}
+    {% endwith %}
+</script>
+
+
+</body>
+</html>

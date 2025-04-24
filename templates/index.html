@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MentorMesh</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- navbar -->
+    {% extends "base.html" %}
+        {% block content %}
+    <!-- page starts -->
+
+    <h1>Welcome to MentorMesh</h1>
+    <a href="/register">Register</a> | <a href="/login">Login</a>
+    <!-- login.html -->
+        {% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
+
+
+        {% endblock %}
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script>
+        // Initialize Pusher
+        var pusher = new Pusher('your_key', {
+            cluster: 'your_cluster'
+        });
+    
+        // Subscribe to the learning channel for messages
+        var channel = pusher.subscribe('learning_channel');
+        channel.bind('new_message', function(data) {
+            var messageContainer = document.getElementById('messages');
+            var newMessage = document.createElement('div');
+            newMessage.innerText = data.user + ': ' + data.message + ' (' + data.timestamp + ')';
+            messageContainer.appendChild(newMessage);
+        });
+    
+        // Subscribe to mentor's private channel for session booking notifications
+        var mentorChannel = pusher.subscribe('mentor_' + mentorId + '_channel');
+        mentorChannel.bind('session_booked', function(data) {
+            alert('New session booked: ' + data.session_details);
+            // Display session details to mentor
+        });
+    
+        // Listen for mentor status updates
+        var statusChannel = pusher.subscribe('mentor_' + mentorId + '_status_channel');
+        statusChannel.bind('status_updated', function(data) {
+            alert('Mentor status updated: ' + data.status);
+            // Update mentor status on the frontend
+        });
+    
+        // Function to send a message
+        function sendMessage() {
+            var message = document.getElementById('message_input').value;
+            fetch('/send_message', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    message: message
+                })
+            });
+        }
+    
+        // Function to update mentor status
+        function updateMentorStatus(status) {
+            fetch('/update_mentor_status', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    status: status,
+                    mentor_id: mentorId  // Pass mentor ID dynamically
+                })
+            });
+        }
+    </script>
+    
+
+</body>
+</html>

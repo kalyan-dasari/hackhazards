@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - MentorMesh</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- navbar -->
+    {% extends "base.html" %}
+        {% block content %}
+    <!-- page starts -->
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}
+
+    <h2>Register for MentorMesh</h2>
+    <form method="POST">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+
+        <label>Role:</label><br>
+        <select name="role" required>
+            <option value="mentor">Mentor</option>
+            <option value="learner">Learner</option>
+        </select><br>
+
+        <label>Skills/Topics (comma separated):</label><br>
+        <input type="text" name="skills" required><br>
+
+        <label>Bio:</label><br>
+        <textarea name="bio" rows="4" cols="50" required></textarea><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="/login">Login here</a></p>
+
+    {% endblock %}
+</body>
+</html>
